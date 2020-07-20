@@ -1,4 +1,4 @@
-os.loadApi("bta")
+os.loadApi("/p/bta.lua")
 
 local args = {...}
 local width = tonumber(args[1])

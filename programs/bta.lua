@@ -27,7 +27,7 @@ function place(placeFunc)
                 return true
             end
         end)
-        if ~isFuelSlot then
+        if not isFuelSlot then
             turtle.select((turtle.getSelectedSlot() + 1) % 16 + 1)
         end
     end
