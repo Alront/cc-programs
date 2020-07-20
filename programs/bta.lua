@@ -9,6 +9,7 @@ function foreach(list, consumerFunc)
 end
 
 function refuel()
+    print("refueling...")
     local lastIndex = turtle.getSelectedSlot()
     foreach(fuelSlots, function(slot) 
         turtle.select(slot)
@@ -19,17 +20,15 @@ end
 
 function place(placeFunc)
     placeFunc = placeFunc or turtle.place()
-    while turtle.getItemCount() == 0 do
-        local isFuelSlot = false
+    local isFuelSlot = false
+    while turtle.getItemCount() == 0  and not isFuelSlot do
         foreach(fuelSlots, function(slot) 
             if fuelSlots[slot] == turtle.getSelectedSlot() then
                 isFuelSlot = true
                 return true
             end
         end)
-        if not isFuelSlot then
-            turtle.select((turtle.getSelectedSlot() + 1) % 16 + 1)
-        end
+        turtle.select((turtle.getSelectedSlot() + 1) % 16 + 1)
     end
     placeFunc()
 end
