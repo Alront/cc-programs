@@ -1,10 +1,10 @@
 local args = {...}
-local width = args[1]
+local width = tonumber(args[1])
 local depth
 if args[2] == nil then
     depth = width
 else
-    depth = args[2]
+    depth = tonumber(args[2])
 end
 
 local function buildDown()
