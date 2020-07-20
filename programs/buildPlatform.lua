@@ -22,10 +22,10 @@ local function forward(length)
 end
 
 local function buildRow(rowLength)
-    for i = 1, rowLength do
+    for i = 1, rowLength - 1 do
         buildDown()
-        forward(1)
     end
+    buildDown()
 end
 
 local builtRows = 0
