@@ -24,6 +24,7 @@ end
 local function buildRow(rowLength)
     for i = 1, rowLength - 1 do
         buildDown()
+        forward(1)
     end
     buildDown()
 end
