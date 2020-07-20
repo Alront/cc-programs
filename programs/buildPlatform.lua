@@ -9,7 +9,7 @@ end
 
 local function buildDown()
     while turtle.getItemCount() == 0 do
-        turtle.select(turtle.getSelectedSlot() + 1)
+        turtle.select((turtle.getSelectedSlot() + 1) % 16 + 1)
     end
     turtle.placeDown()
 end
