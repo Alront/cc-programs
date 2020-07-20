@@ -80,7 +80,7 @@ function buildPlatform(width, depth)
         buildRow(depth)
         builtRows = builtRows + 1
         if(builtRows == width) then break end
-        if(builtRows % 2 == 0) then
+        if(builtRows % 2 == 1) then
             turtle.turnRight()
             forward()
             turtle.turnRight()
