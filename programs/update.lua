@@ -1,7 +1,7 @@
 if fs.exists("/downloads/cc-programs") then
     fs.delete("/downloads/cc-programs")
 end
-shell.run("github Alront cc-programs . programs master")
+shell.run("/github Alront cc-programs . programs master")
 if fs.exists("/p") then
     fs.delete("/p")
 end
