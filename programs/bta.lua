@@ -51,7 +51,7 @@ function move(movementFunc, length)
 end
 
 function forward(length)
-    move(turtle.forawrd, length)
+    move(turtle.forward, length)
 end
 
 function up(length)
