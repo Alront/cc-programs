@@ -8,5 +8,5 @@ if args[2] == nil then
 else
     depth = tonumber(args[2])
 end
-
+bta.storeAsLastPosition()
 bta.buildPlatform(width, depth)
