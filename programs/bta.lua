@@ -314,7 +314,7 @@ function refuel()
 end
 
 function restock()
-    print("refueling...")
+    print("restocking...")
     -- Make space
     clearTemp()
     turtle.select(inv.temp)
@@ -348,7 +348,11 @@ function place(placeFunc)
             break
         end
     end
-    if not hasMaterial then restock() end
+    if not hasMaterial then
+        while turtle.getItemCount() == 0 do
+            restock()
+            end
+        end
     placeFunc()
 end
 
