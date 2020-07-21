@@ -1,7 +1,7 @@
 os.loadAPI("/p/bta.lua")
 local args = {...}
-local height = args[1] or 6
-local layers = args[2] or 1
+local layers = tonumber(args[1]) or 1
+local height = tonumber(args[2]) or 6
 print("Building Tower with layer height "..height.." and "..layers.." layers.")
 
 bta.storeAsLastPosition()
