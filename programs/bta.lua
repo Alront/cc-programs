@@ -71,7 +71,7 @@ function loadPosition(fileName)
     end
 end
 p = loadPosition()
-print("Loaded position "..posString(p))
+--print("Loaded position "..posString(p))
 
 function recordPosition(fileName, pos)
     pos = pos or p
