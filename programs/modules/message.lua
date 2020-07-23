@@ -7,18 +7,24 @@ function protocol(protName, side, name, handleMessageFunc)
             prot.open()
         end
     end
+    side = side or "left"
 
     prot = {
 
         opened = false,
         messageHandler = handleMessageFunc or function() end,
+        side = side,
+
+        lookup = function(name)
+            return rednet.lookup(protName, name)
+        end,
 
         send = function(reciever, message)
             ensureOpened()
             if type(reciever) == "string" then
                 reciever = rednet.lookup(protName, reciever)
             end
-            print("Sending message to id "..reciever..": "..textutils.serialize(message))
+            --print("Sending message to id "..reciever..": "..textutils.serialize(message))
             rednet.send(reciever, message, protName)
         end,
 
@@ -26,13 +32,13 @@ function protocol(protName, side, name, handleMessageFunc)
             ensureOpened()
             tiemout = timeout or 5
             local id, message, _ = rednet.receive(protName, timeout)
-            print("Received message from id "..id..": "..textutils.serialize(message))
+            --print("Received message from id "..id..": "..textutils.serialize(message))
             return id, message
         end,
 
         open = function()
             if prot.opened then return end
-            rednet.open(side)
+            rednet.open(prot.side)
             rednet.host(protName, name)
             prot.opened = true
         end,
@@ -54,7 +60,7 @@ function protocol(protName, side, name, handleMessageFunc)
                 return nil, nil
             end
             while message.title ~= title do
-                print("Got messsage "..textutils.serialize(message).." while waiting for message with title "..title)
+                --print("Got messsage "..textutils.serialize(message).." while waiting for message with title "..title)
                 table.insert(otherMessages, {sender, message})
                 sender, message = prot.receive(timeout)
                 if message == nil then

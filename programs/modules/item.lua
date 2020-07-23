@@ -1,23 +1,24 @@
 os.loadAPI("/p/modules/module.lua")
 module.load("message")
 module.load("bta")
+local name = os.getComputerLabel() or ("Anonymous"..os.getComputerID())
+local prot = message.protocol("Items", nil, name)
 
 -- requests items and stores them in the next free slots, counting from the currently selected one or the given one
 function request(item, quantity, slotIndex, partial, modemSide, completeCallback)
     modemSide = modemSide or "left"
+    prot.side = modemSide
     if slotIndex ~= nil then
         turtle.select(slotIndex)
     end
     if partial == nil then
         partial = true
     end
-
-    local prot
-
-    prot = message.protocol("Items", modemSide, os.getComputerLabel() or ("Anonymous"..os.getComputerID()))
+    
     local request = {
         title = "request",
         partial = partial,
+        name = name
     }
     if type(item) == "string" then
         assert(type(quantity) == "number")
@@ -43,4 +44,12 @@ function request(item, quantity, slotIndex, partial, modemSide, completeCallback
         title = "retreived"
     })
     return response.succcess
+end
+
+function storeAll(modemSide)
+    modemSide = modemSide or "left"
+    prot.side = modemSide
+    prot.send("Server", {
+        title = "store"
+    })
 end

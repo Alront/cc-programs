@@ -53,6 +53,7 @@ local prot
     Item request:
     {
         title: "request"
+        name: requesterName
         partial: bool
         1: {item = ..., quantity = ...}
         2: {item = ..., quantity = ...}
@@ -100,21 +101,34 @@ function handleItemRequest(sender, m)
     local response = {
         title = "request_processed"
     }
+    local function failFunc(message)
+        return function()
+            response.success = false
+            response.message = message
+            prot.send(sender, response)
+            return
+        end
+    end
     local otherMessage = {}
 
+    print("Processing request from "..m.name.." for:")
     for i, request in ipairs(m) do
+        print(request.item..": "..request.quantity)
+        if not prot.lookup(request.item) then
+            local fail = "Unable to locate provider for "..request.item
+            failFunc(fail)()
+            print(fail)
+            flushChest()
+            return
+        end
         prot.send(request.item, {
             title = "provide",
             quantity = request.quantity
         })
-        local provider, reply = prot.receiveWithTitle("provided", otherMessage,
-            function()
-                response.success = false
-                response.message = "Unable to locate provider for "..request.item
-                prot.send(sender, response)
-                return
-            end
-        )
+        local provider, reply = prot.receiveWithTitle("provided", otherMessage, failFunc("Unable to locate provider for "..request.item))
+        if provider == nil then
+            return
+        end
 
         if not reply.succcess then
             insufficient[request.item] = "Only had "..reply.quantity.." "..request.item.." while needing "..request.quantity
@@ -133,20 +147,24 @@ function handleItemRequest(sender, m)
         prot.send(sender, response)
         print(response.message)
     else
+        local summary = ""
+        for i, report in ipairs(response) do
+            summary = summary.."\n"..report.item..": "..report.quantity
+        end
         response.success = true
-        response.message = "Request sucessfully provisioned!"
+        response.message = "Request sucessfully provisioned! Delivered: "..summary
         prot.send(sender, response)
         local message
         for i = 1, 3 do
             _, message = prot.receiveWithTitle("retreived", otherMessage, function()
-                print("Requester has not yet confirmed that items have been received, retrying...")
+                print("Requester has not yet confirmed that items have been received, waiting...")
             end, 60)
             if message ~= nil then break end
         end
         if message == nil then
             print("Did not receive retreival acknowledgement, flushing chest")
         else
-            print("Request successfully completed!")
+            print("Request successfully completed! Delivered: "..summary)
         end
     end
     flushChest()
@@ -157,11 +175,14 @@ function handleMessage(sender, m)
     if type(m) == "table" then
         if m.title == "request" then
             handleItemRequest(sender, m)
+        elseif m.title == "store" then
+            print("Processing flush chest request...")
+            flushChest()
         else
-            print("Unknown message title: "..m.title)
+            print("Unknown message title: "..tostring(m.title))
         end
     else
-        print("Unsupported message type: "..m)
+        print("Unsupported message type: "..tostring(m))
     end
 end
 
