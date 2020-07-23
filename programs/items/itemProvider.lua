@@ -8,9 +8,9 @@ local sendFunc
 local item
 
 local function handleMessage(sender, m)
-    if m ~= nil and message.title == "provide" then
+    if m ~= nil and m.title == "provide" then
         response = {
-            tile = "provided"
+            title = "provided"
         }
         turtle.suck(m.quantity)
         response.quantity = turtle.getItemCount()
@@ -31,25 +31,11 @@ local function handleMessage(sender, m)
     print("Unknown message: "..tostring(m))
 end
 
+-- takes as arguments the item name and optionally the side of the send chest
 local args = {...}
 item = args[1]
-local side = args[2]
-sendFunc = turtle.drop
-if side == "front" then
-    orientation = 0
-elseif side == "back" then
-    orientation = 2
-elseif side == "left" then
-    orientation = 1
-elseif side == "right" then
-    orientation = 3
-elseif side == "top" then
-    orientation = 0
-    sendFunc = turtle.dropUp
-elseif side == "down" then
-    orientation = 0
-    sendFunc = turtle.dropDown
-end
+local side = args[2] or "top"
+sendFunc = bta.getDropFromSide(side)
 
 -- Reset in case something happened and turtle got stuck last time
 bta.moveTo(bta.makePos(0, 0, 0, 0))

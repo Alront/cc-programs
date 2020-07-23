@@ -6,7 +6,7 @@ message.protocol = (protocol, side, name, handleMessageFunc) end
 module = {}
 
 item = {}
-item.request = function(item, quantity, slotIndex, partial, modemSide) end
+item.request = function(item, quantity, slotIndex, partial, modemSide, completeCallback) end
 
 file = {
     function loadFromFile(fileName, keys, stringConversion) end
@@ -20,6 +20,9 @@ shell = {}
 shell.run = function(command) end
 
 function sleep(seconds) end
+function read() end
+
+pocket = {}
 
 peripheral = {}
 

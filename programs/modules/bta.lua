@@ -52,13 +52,68 @@ function posString(pos)
     return "[ "..x..", "..y..", "..z..", "..d.." ]"
 end
 
+-- returns orientation, "up/down/front"
+function getOrientationFromSide(side)
+    local front = "front"
+    local up = "up"
+    local down = "down"
+    if side == "front" then
+        return 0, front
+    elseif side == "back" then
+        return 2, front
+    elseif side == "left" then
+        return 1, front
+    elseif side == "right" then
+        return 3, front
+    elseif side == "top" or side == "up" then
+        return 0, up
+    elseif side == "bottom" or side == "down" then
+        return 0, down
+    end
+end
+
+function getDropFromSide(side)
+    local _, upDown = getOrientationFromSide(side)
+    if upDown == "front" then return turtle.drop
+    elseif upDown == "up" then return turtle.dropUp
+    else return turtle.dropDown end
+end
+
+function getSuckFromSide(side)
+    local _, upDown = getOrientationFromSide(side)
+    if upDown == "front" then return turtle.suck
+    elseif upDown == "up" then return turtle.suckUp
+    else return turtle.suckDown end
+end
+
+function getDigFromSide(side)
+    local _, upDown = getOrientationFromSide(side)
+    if upDown == "front" then return turtle.dig
+    elseif upDown == "up" then return turtle.digUp
+    else return turtle.digDown end
+end
+
+function getMoveFromSide(side)
+    local _, upDown = getOrientationFromSide(side)
+    if upDown == "front" then return forward
+    elseif upDown == "up" then return up
+    else return down end
+end
+
+-- turn to a side, where the side is absolute to the 0 (front) direction of the coord grid
+function turnToSide(side)
+    local d, _ = getOrientationFromSide(side)
+    d = (p.d + d) % 4
+    turnTo(d)
+end
+
 function loadPosition(fileName)
     module.load("file")
     fileName = fileName or posFile
     if file.exists(fileName) then
         return file.loadFromFile(fileName, { "x", "y", "z", "d" }, tonumber)
     else
-        print("No position file present: assuming 0, 0, 0, 0")
+        --print("No position file present: assuming 0, 0, 0, 0")
         return makePos(0, 0, 0, 0)
     end
 end
@@ -283,7 +338,7 @@ function inv.select(name)
     turtle.select(inv[name])
 end
 
-local lastSlot = turtle.getSelectedSlot()
+local lastSlot
 
 local function clearTemp()
     if turtle.getItemCount(inv.temp) > 0 then

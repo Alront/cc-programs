@@ -1,6 +1,6 @@
 -- Message api
 
-function protocol(protocol, side, name, handleMessageFunc)
+function protocol(protName, side, name, handleMessageFunc)
     local prot
     local function ensureOpened()
         if not prot.opened then
@@ -11,57 +11,60 @@ function protocol(protocol, side, name, handleMessageFunc)
     prot = {
 
         opened = false,
-        protocol = name,
         messageHandler = handleMessageFunc or function() end,
 
         send = function(reciever, message)
             ensureOpened()
             if type(reciever) == "string" then
-                reciever = rednet.lookup(name, reciever)
+                reciever = rednet.lookup(protName, reciever)
             end
-            rednet.send(reciever, message, name)
+            print("Sending message to id "..reciever..": "..textutils.serialize(message))
+            rednet.send(reciever, message, protName)
         end,
 
         receive = function(timeout)
             ensureOpened()
             tiemout = timeout or 5
-            id, message, _ = rednet.receive(name, timeout)
+            local id, message, _ = rednet.receive(protName, timeout)
+            print("Received message from id "..id..": "..textutils.serialize(message))
             return id, message
         end,
 
         open = function()
             if prot.opened then return end
             rednet.open(side)
-            rednet.host(protocol, name)
+            rednet.host(protName, name)
             prot.opened = true
         end,
 
         run = function()
             prot.open()
             while true do
-                prot.messageHandler(prot.receive(10000000))
+                local id, message = prot.receive(10000000)
+                prot.messageHandler(id, message)
             end
         end,
 
         receiveWithTitle = function(title, otherMessages, notReceivedFunc, timeout)
-            local provider, reply = prot.receive(timeout)
+            local sender, message = prot.receive(timeout)
             notReceivedFunc = notReceivedFunc or function() print("Did not receive response with title "..title) end
             otherMessages = otherMessages or {}
-            if reply == nil then
+            if message == nil then
                 notReceivedFunc()
                 return nil, nil
             end
-            while reply.title ~= title do
-                table.insert(otherMessages, {provider, reply})
-                provider, reply = prot.recveive()
-                if reply == nil then
+            while message.title ~= title do
+                print("Got messsage "..textutils.serialize(message).." while waiting for message with title "..title)
+                table.insert(otherMessages, {sender, message})
+                sender, message = prot.receive(timeout)
+                if message == nil then
                     return notReceivedFunc()
                 end
             end
-            return provider, reply
+            return sender, message
         end,
 
-        handleOtherMessage = function(otherMessages)
+        handleOtherMessages = function(otherMessages)
             for _, message in ipairs(otherMessages) do
                 prot.messageHandler(message[1], message[2])
             end

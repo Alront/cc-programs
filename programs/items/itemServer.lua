@@ -1,6 +1,49 @@
 os.loadAPI("/p/modules/module.lua")
 module.load("file")
 module.load("message")
+module.load("bta")
+
+
+local flushTo
+local flushFrom
+local modemSide
+
+local function takeItems()
+    bta.turnToSide(flushFrom)
+    local suck = bta.getSuckFromSide(flushFrom)
+    local tookAny = false
+    for i = 1, 16 do
+        turtle.select(i)
+        suck()
+        if turtle.getItemCount() > 0 then
+            tookAny = true
+        else
+            break;
+        end
+    end
+    return tookAny
+end
+
+local function dumpItems()
+    bta.turnToSide(flushTo)
+    local drop = bta.getDropFromSide(flushTo)
+    for i = 1, 16 do
+        turtle.select(i)
+        if turtle.getItemCount() > 0 then
+            drop()
+        else
+            break;
+        end
+    end
+end
+
+function flushChest()
+    local more = takeItems()
+    while more do
+        dumpItems()
+        more = takeItems()
+    end
+end
 
 local prot
 
@@ -87,8 +130,6 @@ function handleItemRequest(sender, m)
         for item, message in insufficient do
             response.message = response.message.."\n"..message
         end
-
-        --[[ TODO: flush ender chest ]]
         prot.send(sender, response)
         print(response.message)
     else
@@ -104,19 +145,18 @@ function handleItemRequest(sender, m)
         end
         if message == nil then
             print("Did not receive retreival acknowledgement, flushing chest")
-            -- flush chest ---------
         else
             print("Request successfully completed!")
         end
     end
-
+    flushChest()
     prot.handleOtherMessages(otherMessage)
 end
 
 function handleMessage(sender, m)
     if type(m) == "table" then
         if m.title == "request" then
-            handleItemRequest(m)
+            handleItemRequest(sender, m)
         else
             print("Unknown message title: "..m.title)
         end
@@ -125,5 +165,12 @@ function handleMessage(sender, m)
     end
 end
 
-prot = message.protocol("Items", "top", "Server", handleMessage)
+local args = {...}
+flushTo = args[1] or "front"
+flushFrom = args[2] or "top"
+modemSide = args[3] or "left"
+
+print("Running Item server and listening to item requests...")
+prot = message.protocol("Items", modemSide, "Server", handleMessage)
 prot.run()
+
