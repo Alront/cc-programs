@@ -1,4 +1,5 @@
-os.loadAPI("/p/bta.lua")
+os.loadAPI("/p/modules/module.lua")
+module.load("bta")
 local args = {...}
 local layers = tonumber(args[1]) or 1
 local height = tonumber(args[2]) or 6

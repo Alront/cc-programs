@@ -1,4 +1,5 @@
-os.loadAPI("/p/bta.lua")
+os.loadAPI("/p/modules/module.lua")
+module.load("bta")
 args = {...}
 local fileName = args[1]
 if fileName == "dig" and args[2] == nil then

@@ -1,4 +1,5 @@
-os.loadAPI("/p/bta.lua")
+os.loadAPI("/p/modules/module.lua")
+module.load("bta")
 
 local args = {...}
 if args[1] == nil or args[2] == nil then
@@ -6,7 +7,6 @@ if args[1] == nil or args[2] == nil then
     print("z and d can be set as \"nil\" to use the current position value")
     return
 end
-print(bta.posString(bta.p))
 local x = tonumber(args[1])
 local y = tonumber(args[2])
 local z
