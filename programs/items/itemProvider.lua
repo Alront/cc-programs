@@ -60,6 +60,7 @@ local args = {...}
 item = args[1]
 local side = args[2] or "top"
 sendFunc = bta.getDropFromSide(side)
+orientation = bta.getOrientationFromSide(side)
 
 -- Make the eintire inventory available to cycle through
 for i = 1, 16 do
