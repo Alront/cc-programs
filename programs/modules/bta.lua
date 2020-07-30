@@ -335,7 +335,11 @@ function inv.slotName(index)
 end
 
 function inv.select(name)
-    turtle.select(inv[name])
+    if type(name) == "number" then
+        turtle.select(name)
+    else
+        turtle.select(inv[name])
+    end
 end
 
 local lastSlot
@@ -350,19 +354,19 @@ function inv.placeChest(chestSlot)
     lastSlot = turtle.getSelectedSlot()
     -- Make space
     clearTemp()
-    turtle.select(inv.temp)
+    inv.select(inv.temp)
     turtle.digUp()
     -- Place chest
-    turtle.select(chestSlot)
+    inv.select(chestSlot)
     turtle.placeUp()
 end
 
 function inv.removeChest(chestSlot)
     inv.select(chestSlot)
     turtle.digUp()
-    turtle.select(inv.temp)
+    inv.select(inv.temp)
     turtle.placeUp()
-    turtle.select(lastSlot)
+    inv.select(lastSlot)
 end
 
 function inv.pull(chestSlot, quantity)
@@ -404,7 +408,7 @@ function restock()
     -- Restock
     for i, slot in ipairs(inv) do
         if slot == slots.normal then
-            turtle.select(i)
+            inv.select(i)
             turtle.suck()
         end
     end
