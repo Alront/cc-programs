@@ -2,6 +2,8 @@ os.loadAPI("/p/modules/module.lua")
 module.load("item")
 module.load("file")
 
+-- Usage request item quantity [partial] [modemside]
+
 function processInput(t)
     local success = (
             t == "thanks" or 
@@ -24,12 +26,19 @@ function processInput(t)
     return success
 end
 
+
 local sideFile = "modemSide"
 
 local args = {...}
+
+if args[1] == nil then
+    print("Usage request item quantity [partial] [modemside]")
+    return
+end
+
 args[2] = args[2] or 1
 
-local modemSide = file.loadValue(sideFile, args[5])
+local modemSide = file.loadValue(sideFile, args[4])
 
 if modemSide == nil then
     if pocket then
@@ -42,7 +51,7 @@ end
 file.storeValue(modemSide, sideFile)
 
 print("Requested items.")
-item.request(args[1], tonumber(args[2]), tonumber(args[3]), args[4], modemSide, function()
+item.request(args[1], tonumber(args[2]), nil, args[3], modemSide, function()
     print("Write \"thanks\" to contiunue once the items have been retreived form the ender chest.")
     local input = read()
     while not processInput(input) do

@@ -366,7 +366,7 @@ function inv.removeChest(chestSlot)
 end
 
 function inv.pull(chestSlot, quantity)
-    quantity = orDefault(quantity, 10000)
+    quantity = orDefault(quantity, 64)
     local pulled = 0
     inv.placeChest(chestSlot)
     while quantity > pulled do
