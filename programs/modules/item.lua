@@ -37,7 +37,7 @@ function request(item, quantity, slotIndex, partial, modemSide, completeCallback
         if completeCallback then
             while not completeCallback() do sleep(1) end
         else
-            bta.pull(bta.inv.items)
+            bta.inv.pull(bta.inv.items)
         end
     end
     prot.send(server, {
