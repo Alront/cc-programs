@@ -144,7 +144,7 @@ function handleItemRequest(sender, m)
     if not success then
         response.success = false
         response.message = "Could not aquire sufficient items:"
-        for item, message in insufficient do
+        for item, message in pairs(insufficient) do
             response.message = response.message.."\n"..message
         end
         prot.send(sender, response)
