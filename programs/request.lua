@@ -1,5 +1,6 @@
 os.loadAPI("/p/modules/module.lua")
 module.load("item")
+module.load("file")
 
 function processInput(t)
     local success = (
@@ -23,9 +24,13 @@ function processInput(t)
     return success
 end
 
+local sideFile = "modemSide"
+
 local args = {...}
 args[2] = args[2] or 1
-local modemSide = args[5]
+
+local modemSide = file.loadValue(sideFile, args[5])
+
 if modemSide == nil then
     if pocket then
         modemSide = "back"
@@ -33,6 +38,8 @@ if modemSide == nil then
         modemSide = "left"
     end
 end
+
+file.storeValue(modemSide, sideFile)
 
 print("Requested items.")
 item.request(args[1], tonumber(args[2]), tonumber(args[3]), args[4], modemSide, function()
