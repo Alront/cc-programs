@@ -32,7 +32,7 @@ local sideFile = "modemSide"
 local args = {...}
 
 if args[1] == nil then
-    print("Usage request item quantity [partial] [modemside]")
+    print("Usage: request item quantity [partial] [modemside]")
     return
 end
 
