@@ -110,6 +110,7 @@ function handleItemRequest(sender, m)
         end
     end
     local otherMessage = {}
+    local success = true
 
     print("Processing request from "..m.name.." for:")
     for i, request in ipairs(m) do
@@ -133,13 +134,14 @@ function handleItemRequest(sender, m)
 
         if not reply.success then
             insufficient[request.item] = "Only had "..reply.quantity.." "..request.item.." while needing "..request.quantity
+            success = false
         end
         response[i] = {
             item = request.item,
             quantity = reply.quantity
         }
     end
-    if #insufficient > 0 then
+    if not success then
         response.success = false
         response.message = "Could not aquire sufficient items:"
         for item, message in insufficient do
