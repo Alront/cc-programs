@@ -123,7 +123,8 @@ function handleItemRequest(sender, m)
         end
         prot.send(request.item, {
             title = "provide",
-            quantity = request.quantity
+            quantity = request.quantity,
+            partial = m.partial
         })
         local provider, reply = prot.receiveWithTitle("provided", otherMessage, failFunc("Unable to locate provider for "..request.item))
         if provider == nil then
