@@ -131,7 +131,7 @@ function handleItemRequest(sender, m)
             return
         end
 
-        if not reply.succcess then
+        if not reply.success then
             insufficient[request.item] = "Only had "..reply.quantity.." "..request.item.." while needing "..request.quantity
         end
         response[i] = {
