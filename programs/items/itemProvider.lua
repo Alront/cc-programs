@@ -22,7 +22,7 @@ local function handleMessage(sender, m)
                 pulled = pulled + turtle.getItemCount()
                 bta.inv.nextSlot()
             end
-            turtle.suck(math.max(m.quantity - pulled, 0))
+            turtle.suck(math.min(math.max(m.quantity - pulled, 0), 64))
             pulled = pulled + turtle.getItemCount()
         end
         response.quantity = pulled
