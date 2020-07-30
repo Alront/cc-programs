@@ -26,7 +26,7 @@ local function handleMessage(sender, m)
             pulled = pulled + turtle.getItemCount()
         end
         response.quantity = pulled
-        response.success = m.quantity == response.quantity or m.partial
+        response.success = (m.quantity == response.quantity) or m.partial
         if not response.success then
             for i = 1, 16 do
                 turtle.select(i)
