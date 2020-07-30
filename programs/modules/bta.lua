@@ -342,8 +342,6 @@ function inv.select(name)
     end
 end
 
-local lastSlot
-
 local function clearTemp()
     if turtle.getItemCount(inv.temp) > 0 then
         while not turtle.drop(inv.temp) do end
@@ -351,7 +349,7 @@ local function clearTemp()
 end
 
 function inv.placeChest(chestSlot)
-    lastSlot = turtle.getSelectedSlot()
+    local lastSlot = turtle.getSelectedSlot()
     -- Make space
     clearTemp()
     inv.select(inv.temp)
@@ -359,9 +357,11 @@ function inv.placeChest(chestSlot)
     -- Place chest
     inv.select(chestSlot)
     turtle.placeUp()
+    inv.select(lastSlot)
 end
 
 function inv.removeChest(chestSlot)
+    local lastSlot = turtle.getSelectedSlot()
     inv.select(chestSlot)
     turtle.digUp()
     inv.select(inv.temp)
