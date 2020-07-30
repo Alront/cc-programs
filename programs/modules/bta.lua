@@ -312,7 +312,7 @@ local function initInv()
     inv[15] = slots.building
     inv[16] = slots.fuel
 
-    for i, name in pairs(inv) do
+    for i, name in ipairs(inv) do
         if inv[name] == nil then
             inv[name] = i
             inv.size = inv.size - 1
