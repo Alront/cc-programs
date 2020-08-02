@@ -4,6 +4,13 @@ function buildLevels(...)
   --slot storagesize + 1 to 2 * storagesize: stairs
   --build level arg1 to arg2
   --or expand tower by arg1 levels (middle must be free for measurements)
+
+  --[[
+    Usages:
+      buildLevels(numberOfLevels) expands tower by numberOfLevels
+      buildLevels(start, end, [pillarheight], [noRefules], [dontAskIfOk]) full arg usage
+    Make sure to have a Fuel chest in slot 14, stair chest in slot 15 and block chest in slot 16
+  ]]
   
   local pausing = false
   local debugging = true
@@ -12,7 +19,7 @@ function buildLevels(...)
   
   local start, endlvl = 0
   
-  local pillarHeight = 5
+  local pillarHeight = 10
   local storageSize = 4
   local fuelChest = 14
   local stairsChest = 15
@@ -401,7 +408,7 @@ function buildLevels(...)
   if askIfOk then
     materials = computeTowerMaterials(start, endlvl, pillarHeight)
     print(materials.blocks.." blocks and "..materials.stairs.." stairs will be needed. OK? (y/n)")
-    local key = os.pullEvent("char") 
+    local event, key = os.pullEvent("char") 
     if key ~= 'y' then 
       printDebug("Aborting...")
       abort = true
