@@ -398,7 +398,7 @@ function refuel()
     -- Refuel
     local function isFullyFueled() return turtle.getFuelLevel() < turtle.getFuelLimit() - 4000 end
     while not isFullyFueled() do
-        turtle.suck(1)
+        turtle.suckUp(1)
         while not turtle.refuel() do
             print("Can't use item as fuel!")
             sleep(5)
@@ -415,7 +415,7 @@ function restock()
     for i, slot in ipairs(inv) do
         if slot == slots.normal then
             inv.select(i)
-            turtle.suck()
+            turtle.suckUp()
         end
     end
     -- Restore state
