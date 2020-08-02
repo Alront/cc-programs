@@ -436,6 +436,7 @@ function place(placeFunc)
     if not hasMaterial then
         while turtle.getItemCount() == 0 do
             restock()
+            inv.select(slots.normal)
             end
         end
     placeFunc()
