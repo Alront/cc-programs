@@ -329,6 +329,11 @@ function inv.nextSlot()
     return turtle.getSelectedSlot()
 end
 
+function inv.prevSlot()
+    turtle.select((turtle.getSelectedSlot() - 1 + inv.size - 1) % inv.size + 1)
+    return turtle.getSelectedSlot()
+end
+
 function inv.slotName(index)
     index = orDefault(index, turtle.getSelectedSlot())
     return inv[index]
@@ -380,6 +385,7 @@ function inv.pull(chestSlot, quantity)
         turtle.suckUp(quantity)
         pulled = pulled + turtle.getItemCount()
         if turtle.getItemCount() == 0 then -- there are no more items to be pulled
+            inv.prevSlot()
             break
         end
     end

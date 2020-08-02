@@ -40,6 +40,9 @@ function request(item, quantity, slotIndex, partial, modemSide, completeCallback
             bta.inv.pull(bta.inv.items)
         end
     end
+    if slotIndex ~= nil then
+        turtle.select(slotIndex)
+    end
     prot.send(server, {
         title = "retreived"
     })
