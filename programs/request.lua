@@ -26,9 +26,6 @@ function processInput(t)
     return success
 end
 
-
-local sideFile = "modemSide"
-
 local args = {...}
 
 if args[1] == nil then
@@ -38,7 +35,7 @@ end
 
 args[2] = args[2] or 1
 
-local modemSide = file.loadValue(sideFile, args[4])
+local modemSide = args[4]
 
 if modemSide == nil then
     if pocket then
@@ -47,8 +44,6 @@ if modemSide == nil then
         modemSide = "left"
     end
 end
-
-file.storeValue(modemSide, sideFile)
 
 print("Requested items.")
 item.request(args[1], tonumber(args[2]), nil, args[3], modemSide, function()

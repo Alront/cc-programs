@@ -27,3 +27,6 @@ pocket = {}
 peripheral = {}
 
 textutils = {}
+
+multiblock = {}
+function multiblock.build(layout) end

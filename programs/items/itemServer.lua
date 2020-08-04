@@ -176,6 +176,7 @@ end
 
 function handleMessage(sender, m)
     if type(m) == "table" then
+        --print("Received message: "..textutils.serialize(m))
         if m.title == "request" then
             handleItemRequest(sender, m)
         elseif m.title == "store" then

@@ -2,6 +2,12 @@ os.loadAPI("/p/modules/module.lua")
 module.load("bta")
 
 local args = {...}
+
+if args[1] == "ground" then
+    while turtle.down() do end
+    return
+end
+
 if args[1] == nil or args[2] == nil then
     print("usage: moveTo x y [z] [d] [dig] [extraHeight]")
     print("z and d can be set as \"nil\" to use the current position value")

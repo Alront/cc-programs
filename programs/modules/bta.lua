@@ -19,7 +19,7 @@ dir = {
     plusY = 3
 }
 
-local function orDefault(value, default)
+function orDefault(value, default)
     if value == nil then
         return default
     else
@@ -206,6 +206,17 @@ function right()
     recordPosition()
 end
 
+function oneEighty()
+    left()
+    left()
+end
+
+function back(distance)
+    oneEighty()
+    forward(distance)
+    oneEighty()
+end
+
 math.sign = function(v)
     if v >= 0 then
         return 1
@@ -334,17 +345,42 @@ function inv.prevSlot()
     return turtle.getSelectedSlot()
 end
 
-function inv.slotName(index)
-    index = orDefault(index, turtle.getSelectedSlot())
-    return inv[index]
+function inv.slotName(slot)
+    if type(slot) == "string" then
+        return slot
+    end
+    slot = orDefault(slot, turtle.getSelectedSlot())
+    return inv[slot]
 end
 
-function inv.select(name)
-    if type(name) == "number" then
-        turtle.select(name)
+function inv.slotNumber(slot)
+    if type(slot) == "number" then
+        return slot
     else
-        turtle.select(inv[name])
+        return inv[slot]
     end
+end
+
+function inv.select(slot)
+    if type(slot) == "number" then
+        turtle.select(slot)
+    else
+        turtle.select(inv[slot])
+    end
+end
+
+
+function inv.count(slot)
+    slot = slot or turtle.getSelectedSlot()
+    return turtle.getItemCount(inv.slotNumber(slot))
+end
+
+function inv.isEmpty(slot)
+    return inv.count(slot) == 0
+end
+
+function inv.current()
+    return turtle.getSelectedSlot()
 end
 
 local function clearTemp()
@@ -354,6 +390,7 @@ local function clearTemp()
 end
 
 function inv.placeChest(chestSlot)
+    chestSlot = chestSlot or slots.items
     local lastSlot = turtle.getSelectedSlot()
     -- Make space
     clearTemp()
@@ -366,6 +403,7 @@ function inv.placeChest(chestSlot)
 end
 
 function inv.removeChest(chestSlot)
+    chestSlot = chestSlot or slots.items
     local lastSlot = turtle.getSelectedSlot()
     inv.select(chestSlot)
     turtle.digUp()
@@ -377,6 +415,7 @@ end
 function inv.pull(chestSlot, quantity)
     quantity = orDefault(quantity, 64)
     local pulled = 0
+    local currentSlot = inv.current()
     inv.placeChest(chestSlot)
     while quantity > pulled do
         while turtle.getItemCount() > 0 do
@@ -385,7 +424,7 @@ function inv.pull(chestSlot, quantity)
         turtle.suckUp(quantity)
         pulled = pulled + turtle.getItemCount()
         if turtle.getItemCount() == 0 then -- there are no more items to be pulled
-            inv.prevSlot()
+            inv.select(currentSlot)
             break
         end
     end
@@ -483,4 +522,19 @@ end
 
 function buildPillarUp(height)
     buildMany(up, placeDown, height + 1)
+end
+
+function drop(side)
+    side = side or "front"
+    getDropFromSide(side)()
+end
+
+function suck(side)
+    side = side or "front"
+    getSuckFromSide(side)()
+end
+
+function dig(side)
+    side = side or "front"
+    getDigFromSide(side)()
 end
