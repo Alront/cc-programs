@@ -524,14 +524,16 @@ function buildPillarUp(height)
     buildMany(up, placeDown, height + 1)
 end
 
-function drop(side)
+function drop(quantity, side)
+    quantity = orDefault(quantity, 64)
     side = side or "front"
-    getDropFromSide(side)()
+    getDropFromSide(side)(quantity)
 end
 
-function suck(side)
+function suck(quantity, side)
+    quantity = orDefault(quantity, 64)
     side = side or "front"
-    getSuckFromSide(side)()
+    getSuckFromSide(side)(quantity)
 end
 
 function dig(side)

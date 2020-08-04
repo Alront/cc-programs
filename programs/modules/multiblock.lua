@@ -47,7 +47,7 @@ function placeFluid(fluidSlot, bottlerSlot, placerSlot, emptySlot, cobbleSlot, a
     -- put in fluid
     bta.up()
     bta.inv.select(fluidSlot)
-    bta.drop()
+    bta.drop(1)
     sleep(5)
 
     -- remove stuff
@@ -81,7 +81,7 @@ function returnItem(slot)
     slot = slot or bta.inv.current()
     bta.inv.placeChest()
     bta.inv.select(slot)
-    bta.drop("up")
+    bta.drop(nil, "up")
     bta.inv.removeChest()
     item.storeAll()
 end
@@ -92,6 +92,8 @@ function doFluids(fluids)
         bta.inv.select(1)
 
         if bta.inv.isEmpty() then
+            returnItem(4)
+            bta.inv.select(1)
             -- look ahead to see if we can request more
             local count = 1
             local j = i + 1
@@ -104,7 +106,6 @@ function doFluids(fluids)
 
         print("Placing fluid "..record.item.." at "..bta.posString(record.position))
         placeFluid(1, 2, 3, 4, 5, true)
-        returnItem(4)
     end
 end
 
@@ -209,9 +210,9 @@ function layoutBuilder()
             if item is a table containing a string, the it is added as a fluid
         ]]
         addCube = function(from, to, item)
-            for x = from.x, to.x do
+            for z = from.z, to.z do
                 for y = from.y, to.y do
-                    for z = from.z, to.z do
+                    for x = from.x, to.x do
                         local it
                         if type(item) == "string" or type(item) == "table" then
                             it = item

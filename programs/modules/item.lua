@@ -78,7 +78,7 @@ function dumpInv()
     bta.inv.select(bta.inv.slots.normal)
     for i = 1, 16 do
         bta.inv.nextSlot()
-        bta.drop("up")
+        bta.drop(nil, "up")
     end
     bta.inv.removeChest()
     storeAll()
