@@ -14,7 +14,6 @@ local prot = message.protocol("Items", file.loadValue(sideFile, nil), name)
 -- returns if the request was successful (always true in case of a partial request where a provider exists)
 function request(item, quantity, slotIndex, partial, modemSide, completeCallback)
     --print("Requesting...")
-
     if modemSide == nil then
         modemSide = file.loadValue(sideFile, "left")
     else
@@ -67,7 +66,7 @@ end
 
 -- sends a request to store all items currently in the items ender chest
 function storeAll(modemSide)
-    modemSide = modemSide or "left"
+    modemSide = file.loadValue(sideFile, "left")
     prot.side = modemSide
     prot.send("Server", {
         title = "store"
