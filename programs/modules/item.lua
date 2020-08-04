@@ -3,9 +3,10 @@ module.load("message")
 module.load("bta")
 module.load("file")
 
-local name = os.getComputerLabel() or ("Anonymous"..os.getComputerID())
-local prot = message.protocol("Items", nil, name)
+
 local sideFile = "modemSide"
+local name = os.getComputerLabel() or ("Anonymous"..os.getComputerID())
+local prot = message.protocol("Items", file.loadValue(sideFile, nil), name)
 
 -- requests items and stores them in the next free slots, counting from the currently selected one or the given one
 -- completeCallback is an optional the function that gets called to check if the items have been retreived, 
