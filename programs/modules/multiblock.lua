@@ -48,7 +48,7 @@ function placeFluid(fluidSlot, bottlerSlot, placerSlot, emptySlot, cobbleSlot, a
     bta.up()
     bta.inv.select(fluidSlot)
     bta.drop(1)
-    sleep(5)
+    sleep(7)
 
     -- remove stuff
     bta.inv.select(emptySlot)
