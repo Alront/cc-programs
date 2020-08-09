@@ -4,9 +4,10 @@ module.load("bta")
 module.load("item")
 module.load("file")
 
-bottler = "bottler"
-fluidPlacer = "fluidPlacer"
 cobble = "cobble"
+dispenser = "dispenser"
+
+stackSize = 64
 
 --[[
     places a fluid below the turtle's current position
@@ -18,56 +19,43 @@ cobble = "cobble"
     The fluid must be stored in fluidSlot in a container the the bottler can empty. The empty container will be dropped back into the 
     if advance is true, the  the turtle will move on to the position in front of it, otherwise it will return to the place it originally was
 ]]
-function placeFluid(fluidSlot, bottlerSlot, placerSlot, emptySlot, cobbleSlot, advance)
-    print("Placing fluid...")
-    -- place bottler
-    bta.inv.select(bottlerSlot)
-    if bta.inv.isEmpty() then
-        requestToCurrentSlot(bottler)
-    end
-    bta.place()
-    bta.down()
-    
+
+function placeFluid(fluidSlot, dispenserSlot, cobbleSlot)
     -- place block to place against
+    bta.down()
     bta.forward()
     bta.inv.select(cobbleSlot)
     if bta.inv.isEmpty() then
         requestToCurrentSlot(cobble)
     end
     bta.place()
-    bta.back()
 
-    --place fluid placer
-    bta.inv.select(placerSlot)
+    -- place dispenser
+    bta.back()
+    bta.inv.select(dispenserSlot)
     if bta.inv.isEmpty() then
-        requestToCurrentSlot(fluidPlacer)
+        requestToCurrentSlot(dispenser)
     end
     bta.place()
 
     -- put in fluid
-    bta.up()
     bta.inv.select(fluidSlot)
     bta.drop(1)
-    sleep(7)
 
-    -- remove stuff
-    bta.inv.select(emptySlot)
-    bta.suck()
-
-    bta.inv.select(bottlerSlot)
-    bta.dig()
-
+    -- activate dispenser, retreive bucket
+    bta.up()
     bta.forward()
-    bta.inv.select(placerSlot)
+    redstone.setOutput("bottom", true)
+    sleep(0.25)
+    redstone.setOutput("bottom", false)
+    bta.suck(1, "down")
+
+    bta.inv.select(dispenserSlot)
     bta.dig("down")
 
-    bta.forward()
     bta.inv.select(cobbleSlot)
+    bta.forward()
     bta.dig("down")
-
-    if not advance then
-        bta.back(2)
-    end
 end
 
 function requestToCurrentSlot(itemName, quantity)
@@ -80,33 +68,58 @@ end
 function returnItem(slot)
     slot = slot or bta.inv.current()
     bta.inv.placeChest()
-    bta.inv.select(slot)
-    bta.drop(nil, "up")
+
+    if type(slot) == "table" then
+        for _, j in ipairs(slot) do
+            if bta.inv.isEmpty(j) then break end
+            bta.inv.select(j)
+            bta.drop(nil, "up")
+        end
+    else
+        bta.inv.select(slot)
+        bta.drop(nil, "up")
+    end
+
     bta.inv.removeChest()
+
     item.storeAll()
 end
 
 function doFluids(fluids)
+    local fluidSlots = { 4, 5, 6, 7, 8, 9, 10, 11 }
+    local buckets = 0
+
     for i, record in ipairs(fluids) do
         bta.moveTo(record.position)
-        bta.inv.select(1)
 
-        if bta.inv.isEmpty() then
-            returnItem(4)
-            bta.inv.select(1)
+        while buckets == 0 do
+            -- empty out old buckets
+            returnItem(fluidSlots)
+
             -- look ahead to see if we can request more
             local count = 1
             local j = i + 1
-            while fluids[j] ~= nil and fluids[j].item == record.item do
+            while fluids[j] ~= nil and fluids[j].item == record.item and count < #fluidSlots do
                 count = count + 1
                 j = j + 1
             end
+
+            bta.inv.select(fluidSlots[1])
             requestToCurrentSlot(record.item, count)
+            for _, j in ipairs(fluidSlots) do
+                if bta.inv.isEmpty(j) then
+                    break
+                else
+                    buckets = buckets + 1
+                end
+            end
         end
 
-        print("Placing fluid "..record.item.." at "..bta.posString(record.position))
-        placeFluid(1, 2, 3, 4, 5, true)
+        --print("Placing fluid "..record.item.." at "..bta.posString(record.position))
+        placeFluid(fluidSlots[buckets], 2, 3)
+        buckets = buckets - 1
     end
+    returnItem(fluidSlots)
 end
 
 function doBlocks(blocks)
@@ -114,23 +127,29 @@ function doBlocks(blocks)
         bta.moveTo(record.position)
         bta.inv.select(1)
 
-        if bta.inv.isEmpty() then
+        while bta.inv.isEmpty() do
             -- look ahead to see if we can request more
             local count = 1
             local j = i + 1
-            while blocks[j] ~= nil and blocks[j].item == record.item do
+            while blocks[j] ~= nil and blocks[j].item == record.item and count < stackSize do
                 count = count + 1
                 j = j + 1
             end
             requestToCurrentSlot(record.item, count)
         end
 
-        print("Building "..record.item.." at "..bta.posString(record.position))
+        --print("Building "..record.item.." at "..bta.posString(record.position))
         bta.placeDown()
     end
 end
 
 --[[
+    Build a multiblock with a given layout.
+    IMPORTANT: The items needed will be requested from an item server. This item server needs to provide
+    cobblestone and a dispenser.
+
+    Fluids need to be provided in buckets that can be placed by a dispenser.
+
     layout = {
         layers = {
             [1] = {
@@ -169,33 +188,87 @@ function build(layout)
 end
 
 function layoutBuilder()
-    layout = {}
-    layers = {}
+    local layout = {}
+    local layers = {}
     layout.layers = layers
 
-    function add(pos, item)
-        if layers[pos.z + 1] == nil then
-            layers[pos.z + 1] = {}
-        end
-        if layers[pos.z + 1].blocks == nil then
-            layers[pos.z + 1].blocks = {}
-        end
-        table.insert(layers[pos.z + 1].blocks, { position = pos, item = item })
+    local maxLayer = 0
+
+    local positions = {}
+    local items = {}
+
+    function posKey(pos)
+        return pos.x.."_"..pos.y.."_"..pos.z
     end
 
-    function addFluid(pos, item)
-        if layers[pos.z + 1] == nil then
-            layers[pos.z + 1] = {}
+    local function addThing(pos, item, thingField)
+        local entry = { position = pos, item = item }
+
+        local posString = posKey(pos)
+
+        if pos.z + 1 > maxLayer then
+            maxLayer = pos.z + 1
         end
-        if layers[pos.z + 1].fluids == nil then
-            layers[pos.z + 1].fluids = {}
+
+        if positions[posString] ~= nil then -- this position was already written to, we will overwrite
+            local rec = positions[posString]
+            if items[rec.entry.item] then
+                items[rec.entry.item] = items[rec.entry.item] - 1
+            end
+            layers[rec.layer][thingField][rec.index] = entry
+            rec.entry = entry
+            if items[rec.entry.item] then
+                items[rec.entry.item] = items[rec.entry.item] + 1
+            else
+                items[rec.entry.item] = 1
+            end
+        else -- new position, add it and record
+
+            -- make sure the relevant tables exist
+            if layers[pos.z + 1] == nil then
+                layers[pos.z + 1] = {}
+            end
+            if layers[pos.z + 1][thingField] == nil then
+                layers[pos.z + 1][thingField] = {}
+            end
+
+            table.insert(layers[pos.z + 1][thingField], entry) -- add the block at the end of the list for this layer
+            positions[posString] = {layer = pos.z + 1, index = #(layers[pos.z + 1][thingField]), entry = entry} -- record the block at this position
+            if items[item] then
+                items[item] = items[item] + 1
+            else
+                items[item] = 1
+            end
         end
-        table.insert(layers[pos.z + 1].fluids, { position = pos, item = item })
     end
+
+    local function add(pos, item) addThing(pos, item, "blocks") end
+    local function addFluid(pos, item) addThing(pos, item, "fluids") end
+
+    local function signum(number)
+        if number >= 0 then
+           return 1
+        elseif number < 0 then
+           return -1
+        end
+     end
 
     return {
 
         finalize = function()
+            -- make sure the list is contiguous so that all layer can be looped through without preemtive loop exit
+            for i = 1, maxLayer do
+                if layers[i] == nil then
+                    layers[i] = {}
+                end
+            end 
+
+            local resourceReq = "Items required:"
+            for item, count in pairs(items) do
+                resourceReq = resourceReq.."\n"..item..": "..count
+            end
+            print(resourceReq)
+
             file.storeValue(layout, "debug")
             return layout
         end,
@@ -210,9 +283,9 @@ function layoutBuilder()
             if item is a table containing a string, the it is added as a fluid
         ]]
         addCube = function(from, to, item)
-            for z = from.z, to.z do
-                for y = from.y, to.y do
-                    for x = from.x, to.x do
+            for z = from.z, to.z, signum(to.z - from.z) do
+                for y = from.y, to.y, signum(to.y - from.y) do
+                    for x = from.x, to.x, signum(to.x - from.x) do
                         local it
                         if type(item) == "string" or type(item) == "table" then
                             it = item

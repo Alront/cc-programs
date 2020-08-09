@@ -61,7 +61,7 @@ function request(item, quantity, slotIndex, partial, modemSide, completeCallback
         title = "retreived"
     })
     --print("Returning from request function: "..tostring(response.success))
-    return (partial and response.quantity > 0) or ((not partial) and response.success)
+    return (partial and response[1] and response[1].quantity) or ((not partial) and response.success)
 end
 
 -- sends a request to store all items currently in the items ender chest

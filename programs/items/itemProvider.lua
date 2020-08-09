@@ -67,6 +67,6 @@ for i = 1, 16 do
     bta.inv[i] = bta.inv.slots.normal
 end
 
-print("Waiting to provide "..item.." and sending into inventory on side "..side)
+print("\nWaiting to provide "..item.." and sending into inventory on side "..side)
 prot = message.protocol("Items", "left", item, handleMessage)
 prot.run()
