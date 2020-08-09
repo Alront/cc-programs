@@ -268,6 +268,8 @@ function layoutBuilder()
                 resourceReq = resourceReq.."\n"..item..": "..count
             end
             print(resourceReq)
+            print("Press any key to start building...")
+            os.pullEvent("char")
 
             file.storeValue(layout, "debug")
             return layout
