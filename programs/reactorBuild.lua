@@ -3,6 +3,7 @@ os.loadAPI("/p/modules/module.lua")
 module.load("bta")
 module.load("multiblock")
 
+local args = {...}
 
 local casing = "reactorCasing"
 local controlRod = "controlRod"
