@@ -9,9 +9,12 @@ local controlRod = "controlRod"
 local resonantEnder = "resonantEnder"
 local fuelRod = "fuelRod"
 
+local size = tonumber(args[1]) or 7
+local height = tonumber(args[2]) or 7
+
 -- -1 because coordinates start at 0
-local size = 7  -1
-local height  = 4  -1
+size = size  -1
+height  = height  -1
 
 local function isFuelRod(x, y)
     if x < 2 or x > size - 2 or y < 2 or y > size - 2 then
@@ -49,20 +52,5 @@ b.addCube(p(0, 0, height), p(size, size, height), function(x, y) -- ceiling
         return casing
     end
 end)
-
-
---[[
-b.add(p(1, 1, 0), "glass")
-b.addCube(p(0, 0, 1), p(2, 2, 3), function(x, y, z)
-    local ret
-    if (x + y + z) % 2 == 0 then
-        ret = "glass"
-    else
-        ret = {"water"}
-    end
-    --print(x.." "..y.." "..z.." "..ret)
-    return ret
-end)
-]]
 
 multiblock.build(b.finalize())
