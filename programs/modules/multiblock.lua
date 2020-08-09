@@ -74,7 +74,7 @@ function requestToCurrentSlot(itemName, quantity)
     quantity = quantity or 1
     sleep(2)
     print("Requesting "..quantity.." "..tostring(itemName))
-    while not item.request(itemName, quantity, nil, false) do end
+    while not item.request(itemName, quantity, nil, true) do end
 end
 
 function returnItem(slot)
